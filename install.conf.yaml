@@ -1,0 +1,19 @@
+- defaults:
+    link:
+      create: true
+      relink: true
+
+- clean:
+    ~/:
+      force: true
+    ~/.config:
+      recursive: true
+
+- link:
+    ~/:
+      glob: true
+      path: home/*
+      prefix: "."
+    ~/.config/nvim/:
+      glob: true
+      path: config/nvim/*
