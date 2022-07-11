@@ -130,7 +130,7 @@ return require('packer').startup({
         -- debugging
         use {"mfussenegger/nvim-dap", config = config("nvim-dap")}
         use {"rcarriga/nvim-dap-ui", config = config("nvim-dap-ui")}
-        use {"theHamsta/nvim-dap-virtual-text"}
+        use {"theHamsta/nvim-dap-virtual-text", config = config("nvim-dap-virtual-text")}
         use {"nvim-telescope/telescope-dap.nvim"}
         use {
             'mfussenegger/nvim-dap-python', config = config("nvim-dap-python"),
