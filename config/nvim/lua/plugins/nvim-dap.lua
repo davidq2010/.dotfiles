@@ -1,0 +1,10 @@
+local u = require("utils")
+
+u.nmap("<F5>", ":lua require'dap'.continue()<CR>")
+u.nmap("<F10>", ":lua require'dap'.step_over()<CR>")
+u.nmap("<F11>", ":lua require'dap'.step_into()<CR>")
+u.nmap("<F12>", ":lua require'dap'.step_out()<CR>")
+u.nmap("<leader>b", ":lua require'dap'.toggle_breakpoint()<CR>")
+u.nmap("<leader>B", ":lua require'dap'.set_breakpoint(vim.fn.input('Breakpoint condition: '))<CR>")
+u.nmap("<leader>lp", ":lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<CR>")
+u.nmap("<leader>dr", ":lua require'dap'.repl.open()<CR>")

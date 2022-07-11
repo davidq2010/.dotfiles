@@ -1,2 +1,5 @@
 [init]
 	defaultBranch = main
+[user]
+	email = davidq2010@gmail.com
+	name = davidq2010

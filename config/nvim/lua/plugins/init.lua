@@ -127,6 +127,16 @@ return require('packer').startup({
         -- colorscheme
         use {'Mofiqul/dracula.nvim'}
 
+        -- debugging
+        use {"mfussenegger/nvim-dap", config = config("nvim-dap")}
+        use {"rcarriga/nvim-dap-ui", config = config("nvim-dap-ui")}
+        use {"theHamsta/nvim-dap-virtual-text"}
+        use {"nvim-telescope/telescope-dap.nvim"}
+        use {
+            'mfussenegger/nvim-dap-python', config = config("nvim-dap-python"),
+            requires = { 'nvim-treesitter/nvim-treesitter' }
+        }
+
         -- TODO: Add plugins for git
 
         -- Automatically set up your configuration after cloning packer.nvim

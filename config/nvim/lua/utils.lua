@@ -24,7 +24,7 @@ M.map = function(mode, target, source, opts)
 end
 
 -- Add some common map modes to M
-for _, mode in ipairs({ "n", "o", "i", "x", "t" }) do
+for _, mode in ipairs({ "n", "v", "o", "i", "x", "t" }) do
     M[mode .. "map"] = function(...)
         M.map(mode, ...)
     end
