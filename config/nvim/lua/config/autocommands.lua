@@ -82,6 +82,6 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 -- Do not automatically insert comment leader after hitting o or O in Normal mode
 vim.api.nvim_create_autocmd("FileType", {
     pattern = "*",
-    command = "setlocal formatoptions-=o formatoptions-=c",
+    command = "setlocal formatoptions-=o formatoptions-=c formatoptions+=t formatoptions+=j formatoptions+=r formatoptions+=q formatoptions+=l",
     desc = "Set options for how Vim formats text"
 })

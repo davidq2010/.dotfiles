@@ -127,6 +127,9 @@ return require('packer').startup({
         -- colorscheme
         use {'Mofiqul/dracula.nvim'}
 
+        -- indent
+        use {'lukas-reineke/indent-blankline.nvim'}
+
         -- debugging
         use {"mfussenegger/nvim-dap", config = config("nvim-dap")}
         use {"rcarriga/nvim-dap-ui", config = config("nvim-dap-ui")}
@@ -134,7 +137,14 @@ return require('packer').startup({
         use {"nvim-telescope/telescope-dap.nvim"}
         use {
             'mfussenegger/nvim-dap-python', config = config("nvim-dap-python"),
-            requires = { 'nvim-treesitter/nvim-treesitter' }
+            requires = {
+                {
+                    'nvim-treesitter/nvim-treesitter'
+                },
+                {
+                    "mfussenegger/nvim-dap"
+                }
+            }
         }
 
         -- TODO: Add plugins for git
