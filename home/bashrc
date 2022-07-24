@@ -137,11 +137,6 @@ fi
 unset __conda_setup
 # <<< conda initialize <<<
 
-# Add pylint to path
-if [ -f "/home/${USER}/.local/bin/pylint" ]; then
-    export PATH="${PATH}:/home/${USER}/.local/bin"
-fi
-
 # add WSL to .bashrc
 export DISPLAY=localhost:0.0
 

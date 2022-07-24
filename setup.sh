@@ -5,6 +5,9 @@
 shopt -s nocasematch
 
 ORIGINAL_DIR=$(pwd)
+# 0 means dry run
+DRY_RUN=1
+
 # Idea:
 # *) Dict of binaries to its install/update command
 # *) Create a graph of binaries to all the things that depend on it
@@ -26,43 +29,23 @@ CPPCHECK=cppcheck
 PYLINT=pylint
 NVIM=nvim
 
-# Initial list of binaries to install but allow user to override
-TO_INSTALL=("$CURL" "$NPM" "$PYTHON" "$PIP" "$DEBUGPY" "$DOTNET" "$TELESCOPE_DEPS" "$STYLUA" "$ESLINT" "$CPPCHECK" "$PYLINT" "$NVIM")
-
-# Construct dependency graph
-declare -A DEPENDENCIES=(
-    [$NVIM]="$CURL $NPM $PYTHON $PIP $DEBUGPY $DOTNET $TELESCOPE_DEPS $STYLUA $ESLINT $CLANG $GCC $CPPCHECK $PYLINT"
-    [$DEBUGPY]="$PYTHON $PIP"
-    [$PYLINT]="$PYTHON $PIP"
-    [$PYTHON]=""
-    [$PIP]="$PYTHON"
-    [$ESLINT]="$NPM"
-    [$DOTNET]=""
-    [$TELESCOPE_DEPS]=""
-    [$STYLUA]="$CURL"
-    [$CLANG]=""
-    [$GCC]=""
-    [$CPPCHECK]=""
-    [$CURL]=""
-    [$NPM]="$CURL"
-)
-
 # Map binaries to their installation functions
 # https://stackoverflow.com/questions/5672289/bash-pass-a-function-as-parameter
 declare -A INSTALL_FNS=(
-    [$NPM]="install_npm"
-    [$PYTHON]="install_python"
-    [$PIP]="install_pip"
-    [$DEBUGPY]="install_debugpy"
-    [$DOTNET]="install_dotnet"
-    [$TELESCOPE_DEPS]="install_telescope_deps"
-    [$STYLUA]="install_stylua"
-    [$ESLINT]="install_eslint"
-    [$CLANG]="install_clang"
-    [$GCC]="install_gcc"
-    [$CPPCHECK]="install_cppcheck"
-    [$PYLINT]="install_pylint"
-    [$NVIM]="install_nvim"
+    [CURL]="install_curl"
+    [NPM]="install_npm"
+    [PYTHON]="install_python"
+    [PIP]="install_pip"
+    [DEBUGPY]="install_debugpy"
+    [DOTNET]="install_dotnet"
+    [TELESCOPE_DEPS]="install_telescope_deps"
+    [STYLUA]="install_stylua"
+    [ESLINT]="install_eslint"
+    [CLANG]="install_clang"
+    [GCC]="install_gcc"
+    [CPPCHECK]="install_cppcheck"
+    [PYLINT]="install_pylint"
+    [NVIM]="install_nvim"
 )
 
 # Determine system package installer based on OS
@@ -135,109 +118,146 @@ check_for_package_and_install() {
 # Installation functions
 install_curl () {
     echo Installing $CURL...
-    check_for_package_and_install curl
+    if [[ $DRY_RUN != 0 ]]; then
+        check_for_package_and_install $CURL
+    fi
 }
 
 install_npm () {
     echo Installing $NPM...
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-    nvm install --lts
+    # TODO: Update when necessary
+    if [[ $DRY_RUN != 0 ]]; then
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+        nvm install --lts
+    fi
 }
 
 install_python () {
     echo Installing $PYTHON...
-    check_for_package_and_install $PYTHON
+    if [[ $DRY_RUN != 0 ]]; then
+        check_for_package_and_install $PYTHON
+    fi
 }
 
 install_pip () {
     echo Installing $PIP...
-    check_for_package_and_install $PYTHON-$PIP
+    if [[ $DRY_RUN != 0 ]]; then
+        check_for_package_and_install $PYTHON-$PIP
+    fi
 }
 
 install_debugpy () {
     echo Installing $DEBUGPY...
-    [[ ! -d "$HOME/.virtualenvs" ]] && mkdir "$HOME/.virtualenvs"
-    cd "$HOME/.virtualenvs" || return 1
-    local create_venv_cmd
-    create_venv_cmd="$PYTHON -m venv $DEBUGPY"
-    if [[ $(create_venv_cmd) != 0 ]]; then
-        local path_to_curr_python
-        path_to_curr_python=$(readlink -f "$(which $PYTHON)")
-        local prefix
-        prefix=${path_to_curr_python%%"${PYTHON}"*}
-        local idx_of_substr
-        idx_of_substr=${#prefix}
-        check_for_package_and_install "${path_to_curr_python:$idx_of_substr}-venv"
-        create_venv_cmd
+    if [[ $DRY_RUN != 0 ]]; then
+        [[ ! -d "$HOME/.virtualenvs" ]] && mkdir "$HOME/.virtualenvs"
+        cd "$HOME/.virtualenvs" || return 1
+        local create_venv_cmd
+        create_venv_cmd="$PYTHON -m venv $DEBUGPY"
+        if [[ $($create_venv_cmd) != 0 ]]; then
+            # Need to install python*-venv
+            # Get the * based on python* binary
+            local path_to_curr_python
+            # The 'python3' binary is usually symlinked to a different binary, like 'python3.10'
+            path_to_curr_python=$(readlink -f "$(which $PYTHON)")
+            local prefix
+            prefix=${path_to_curr_python%%"${PYTHON}"*}
+            local idx_of_substr
+            idx_of_substr=${#prefix}
+            check_for_package_and_install "${path_to_curr_python:$idx_of_substr}-venv"
+            $create_venv_cmd
+        fi
+        $DEBUGPY/bin/$PYTHON -m pip install debugpy
+        cd "$ORIGINAL_DIR" || return 1
     fi
-    $DEBUGPY/bin/$PYTHON -m pip install debugpy
-    cd "$ORIGINAL_DIR" || return 1
 }
 
 install_dotnet () {
     echo Installing $DOTNET...
-    if [[ $OS =~ "Arch" ]]; then
-        check_for_package_and_install $DOTNET
-    elif [[ $OS =~ "Ubuntu" || $OS =~ "Debian" ]]; then
-        wget https://packages.microsoft.com/config/debian/11/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
-        sudo dpkg -i packages-microsoft-prod.deb
-        rm packages-microsoft-prod.deb
-        sudo apt-get install -y apt-transport-https && sudo apt-get update
-        check_for_package_and_install ${DOTNET}
+    if [[ $DRY_RUN != 0 ]]; then
+        if [[ $OS =~ "Arch" ]]; then
+            check_for_package_and_install $DOTNET
+        elif [[ $OS =~ "Ubuntu" || $OS =~ "Debian" ]]; then
+            wget https://packages.microsoft.com/config/debian/11/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+            sudo dpkg -i packages-microsoft-prod.deb
+            rm packages-microsoft-prod.deb
+            sudo apt-get install -y apt-transport-https && sudo apt-get update
+            check_for_package_and_install ${DOTNET}
+        fi
     fi
 }
 
 install_telescope_deps () {
     echo Installing $TELESCOPE_DEPS...
-    check_for_package_and_install ripgrep
-    if [[ $OS =~ "Arch" ]]; then
-        check_for_package_and_install fd
-    elif [[ $OS =~ "Ubuntu" || $OS =~ "Debian" ]]; then
-        check_for_package_and_install fd-find
-        # b/c there's another package named fd
-        ln -s "$(which fdfind)" ~/.local/bin/fd
+    if [[ $DRY_RUN != 0 ]]; then
+        check_for_package_and_install ripgrep
+        if [[ $OS =~ "Arch" ]]; then
+            check_for_package_and_install fd
+        elif [[ $OS =~ "Ubuntu" || $OS =~ "Debian" ]]; then
+            check_for_package_and_install fd-find
+            # b/c there's another package named fd
+            ln -s "$(which fdfind)" ~/.local/bin/fd
+        fi
     fi
 }
 
 install_stylua () {
     echo Installing $STYLUA...
-    curl -LO https://github.com/JohnnyMorganz/StyLua/releases/latest/download/stylua-linux.zip
-    unzip $STYLUA
-    chmod u+x $STYLUA
-    sudo mv $STYLUA /usr/local/bin/$STYLUA
-    rm $STYLUA-linux.zip
+    if [[ $DRY_RUN != 0 ]]; then
+        curl -LO https://github.com/JohnnyMorganz/StyLua/releases/latest/download/stylua-linux.zip
+        unzip $STYLUA
+        chmod u+x $STYLUA
+        sudo mv $STYLUA /usr/local/bin/$STYLUA
+        rm $STYLUA-linux.zip
+    fi
 }
 
 install_eslint () {
     echo Installing $ESLINT...
-    npm install -g eslint
+    if [[ $DRY_RUN != 0 ]]; then
+        npm install -g eslint
+    fi
 }
 
 install_clang () {
     echo Installing $CLANG...
-    check_for_package_and_install $CLANG
+    if [[ $DRY_RUN != 0 ]]; then
+        check_for_package_and_install $CLANG
+    fi
 }
 
 install_gcc () {
     echo Installing $GCC...
-    check_for_package_and_install $GCC
+    if [[ $DRY_RUN != 0 ]]; then
+        check_for_package_and_install $GCC
+    fi
 }
 
 install_cppcheck () {
     echo Installing $CPPCHECK...
-    check_for_package_and_install $CPPCHECK
+    if [[ $DRY_RUN != 0 ]]; then
+        check_for_package_and_install $CPPCHECK
+    fi
 }
 
 install_pylint () {
-    echo Installing $PYLINT
-    $PIP install $PYLINT
+    echo Installing $PYLINT...
+    if [[ $DRY_RUN != 0 ]]; then
+        $PIP install $PYLINT
+    fi
 }
 
 install_nvim () {
     echo Installing $NVIM...
-    curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
-    chmod u+x nvim.appimage
-    sudo mv nvim.appimage /usr/local/bin/nvim
+    if [[ $DRY_RUN != 0 ]]; then
+        curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
+        chmod u+x nvim.appimage
+        sudo mv nvim.appimage /usr/local/bin/nvim
+    fi
 }
 
 # Determine order of installation based on dependency graph (DFS)
+install_python
+INSTALL_ORDER=$($PYTHON get_install_order.py NVIM_DEPENDENCIES.json)
+for binary in $INSTALL_ORDER; do
+    ${INSTALL_FNS[$binary]}
+done

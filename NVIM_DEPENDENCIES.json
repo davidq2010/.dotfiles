@@ -1,0 +1,16 @@
+{
+        "DEBUGPY": ["PYTHON", "PIP"],
+        "PYLINT": ["PYTHON", "PIP"],
+        "PYTHON": [],
+        "PIP": ["PYTHON"],
+        "ESLINT": ["NPM"],
+        "DOTNET": [],
+        "TELESCOPE_DEPS": [],
+        "STYLUA": ["CURL"],
+        "CLANG": [],
+        "GCC": [],
+        "CPPCHECK": [],
+        "CURL": [],
+        "NPM": ["CURL"],
+        "NVIM": ["CURL", "NPM", "PYTHON", "PIP", "DEBUGPY", "DOTNET", "TELESCOPE_DEPS", "STYLUA", "ESLINT", "CLANG", "GCC", "CPPCHECK", "PYLINT"]
+}
