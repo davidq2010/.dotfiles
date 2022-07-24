@@ -214,7 +214,7 @@ install_stylua () {
 install_eslint () {
     echo Installing $ESLINT...
     if [[ $DRY_RUN != 0 ]]; then
-        npm install -g eslint
+        sudo npm install -g eslint
     fi
 }
 
