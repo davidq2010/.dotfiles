@@ -93,18 +93,25 @@ fi
 check_for_package_and_install() {
     local pkg=$1
     if [[ $OS =~ "Ubuntu" || $OS =~ "Debian" ]]; then
+        echo Installing using apt...
         # Only install if not on system
-        if ! sudo dpkg -s "$pkg"; then
-            if apt-cache search --names-only "^${pkg}$"; then
+        if ! sudo dpkg -s "$pkg" 2>&1 /dev/null; then
+            echo "$pkg is not already installed, trying to install from package manager"
+            if apt-cache search --names-only "^${pkg}$" 2>&1 /dev/null; then
+                echo "Installing $pkg from package manager"
                 sudo apt --assume-yes --install-suggests install "$pkg"
             fi
         fi
     elif [[ $OS =~ "Arch" ]]; then
+        echo Installing using pacman...
         # Only install if not on system
         if ! pacman -Qi "$pkg"; then
-            if echo "$PACMAN_PACKAGES" | grep "^${pkg}$"; then
+            echo "$pkg is not already installed, trying to install from package manager"
+            if echo "$PACMAN_PACKAGES" | grep "^${pkg}$" 2>&1 /dev/null; then
+                echo "Installing $pkg from pacman repo"
                 yes | sudo pacman -S "$pkg"
-            elif echo "$AUR_PACKAGES" | grep "^${pkg}$"; then
+            elif echo "$AUR_PACKAGES" | grep "^${pkg}$" 2>&1 /dev/null; then
+                echo "Installing $pkg from AUR"
                 [[ ! -d "$HOME/AURPackages" ]] && mkdir "$HOME/AURPackages"
                 # If couldn't cd, return failure code
                 cd "$HOME/AURPackages" || return 1
@@ -138,9 +145,9 @@ install_npm () {
     if [[ $DRY_RUN != 0 ]]; then
         curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
         nvm install --lts
-	export NVM_DIR="$HOME/.nvm"
-	[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-	[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+        export NVM_DIR="$HOME/.nvm"
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+        [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
     fi
 }
 
@@ -280,7 +287,10 @@ install_python
 install_pip
 $PIP install -U pytest
 INSTALL_ORDER=$($PYTHON get_install_order.py NVIM_DEPENDENCIES.json)
-echo Install order: "$INSTALL_ORDER"
+echo "Install order: $INSTALL_ORDER"
 for binary in $INSTALL_ORDER; do
-    ${INSTALL_FNS[$binary]}
+    if ! ${INSTALL_FNS[$binary]}; then
+        echo "Error installing $binary"
+        exit 1
+    fi
 done
