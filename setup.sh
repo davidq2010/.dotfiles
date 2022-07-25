@@ -129,6 +129,9 @@ install_npm () {
     if [[ $DRY_RUN != 0 ]]; then
         curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
         nvm install --lts
+	export NVM_DIR="$HOME/.nvm"
+	[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+	[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion	
     fi
 }
 
@@ -143,6 +146,7 @@ install_pip () {
     echo Installing $PIP...
     if [[ $DRY_RUN != 0 ]]; then
         check_for_package_and_install $PYTHON-$PIP
+	$PIP install --upgrade pip
     fi
 }
 
@@ -214,7 +218,7 @@ install_stylua () {
 install_eslint () {
     echo Installing $ESLINT...
     if [[ $DRY_RUN != 0 ]]; then
-        sudo npm install -g eslint
+        sudo npm install --location=global eslint
     fi
 }
 
