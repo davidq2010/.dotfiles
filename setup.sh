@@ -199,7 +199,7 @@ install_telescope_deps () {
         elif [[ $OS =~ "Ubuntu" || $OS =~ "Debian" ]]; then
             check_for_package_and_install fd-find
             # b/c there's another package named fd
-            ln -s "$(which fdfind)" ~/.local/bin/fd
+            ln -s "$(which fd-find)" ~/.local/bin/fd
         fi
     fi
 }
@@ -208,7 +208,7 @@ install_stylua () {
     echo Installing $STYLUA...
     if [[ $DRY_RUN != 0 ]]; then
         curl -LO https://github.com/JohnnyMorganz/StyLua/releases/latest/download/stylua-linux.zip
-        unzip $STYLUA
+        unzip $STYLUA-linux.zip
         chmod u+x $STYLUA
         sudo mv $STYLUA /usr/local/bin/$STYLUA
         rm $STYLUA-linux.zip
