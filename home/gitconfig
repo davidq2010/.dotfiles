@@ -3,3 +3,5 @@
 [user]
 	email = davidq2010@gmail.com
 	name = davidq2010
+[core]
+	editor=vim

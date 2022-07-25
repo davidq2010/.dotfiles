@@ -11,6 +11,7 @@
         "GCC": [],
         "CPPCHECK": [],
         "CURL": [],
+        "CMAKE": [],
         "NPM": ["CURL"],
-        "NVIM": ["CURL", "NPM", "PYTHON", "PIP", "DEBUGPY", "DOTNET", "TELESCOPE_DEPS", "STYLUA", "ESLINT", "CLANG", "GCC", "CPPCHECK", "PYLINT"]
+        "NVIM": ["CURL", "NPM", "CMAKE", "PYTHON", "PIP", "DEBUGPY", "DOTNET", "TELESCOPE_DEPS", "STYLUA", "ESLINT", "CLANG", "GCC", "CPPCHECK", "PYLINT"]
 }

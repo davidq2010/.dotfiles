@@ -9,8 +9,8 @@ require("config.mappings")
 require("config.autocommands")
 
 -- The following will look for lua/*/init.lua
-require("lsp")
 require("plugins")
+require("lsp")
 
 -- Vim options
 require("config.options") -- Sources lua/config/options.lua

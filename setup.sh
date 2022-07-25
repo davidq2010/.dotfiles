@@ -15,6 +15,7 @@ DRY_RUN=1
 
 # NVIM BINARIES
 CURL=curl
+CMAKE=cmake
 NPM=npm
 PYTHON=python
 PIP=pip
@@ -33,6 +34,7 @@ NVIM=nvim
 # https://stackoverflow.com/questions/5672289/bash-pass-a-function-as-parameter
 declare -A INSTALL_FNS=(
     [CURL]="install_curl"
+    [CMAKE]="install_cmake"
     [NPM]="install_npm"
     [PYTHON]="install_python"
     [PIP]="install_pip"
@@ -91,18 +93,18 @@ fi
 check_for_package_and_install() {
     local pkg=$1
     if [[ $OS =~ "Ubuntu" || $OS =~ "Debian" ]]; then
-        # Only install if not on s ystem
-        if [[ $(sudo dpkg -s "$pkg") != 0 ]]; then
-            if [[ $(apt-cache search --names-only "^${pkg}$") == 0 ]]; then
-                sudo apt-get --assume-yes --install-suggests install "$pkg"
+        # Only install if not on system
+        if ! sudo dpkg -s "$pkg"; then
+            if apt-cache search --names-only "^${pkg}$"; then
+                sudo apt --assume-yes --install-suggests install "$pkg"
             fi
         fi
     elif [[ $OS =~ "Arch" ]]; then
         # Only install if not on system
-        if [[ $(pacman -Qi "$pkg") != 0 ]]; then
-            if [[ $(echo "$PACMAN_PACKAGES" | grep "^${pkg}$") == 0 ]]; then
+        if ! pacman -Qi "$pkg"; then
+            if echo "$PACMAN_PACKAGES" | grep "^${pkg}$"; then
                 yes | sudo pacman -S "$pkg"
-            elif [[ $(echo "$AUR_PACKAGES" | grep "^${pkg}$") == 0 ]]; then
+            elif echo "$AUR_PACKAGES" | grep "^${pkg}$"; then
                 [[ ! -d "$HOME/AURPackages" ]] && mkdir "$HOME/AURPackages"
                 # If couldn't cd, return failure code
                 cd "$HOME/AURPackages" || return 1
@@ -123,6 +125,13 @@ install_curl () {
     fi
 }
 
+install_cmake () {
+    echo Installing $CMAKE...
+    if [[ $DRY_RUN != 0 ]]; then
+        check_for_package_and_install $CMAKE
+    fi
+}
+
 install_npm () {
     echo Installing $NPM...
     # TODO: Update when necessary
@@ -131,7 +140,7 @@ install_npm () {
         nvm install --lts
 	export NVM_DIR="$HOME/.nvm"
 	[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-	[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion	
+	[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
     fi
 }
 
@@ -145,8 +154,8 @@ install_python () {
 install_pip () {
     echo Installing $PIP...
     if [[ $DRY_RUN != 0 ]]; then
-        check_for_package_and_install $PYTHON-$PIP
-	$PIP install --upgrade pip
+        echo "$PYTHON-$PIP"
+        check_for_package_and_install "$PYTHON-$PIP"
     fi
 }
 
@@ -158,6 +167,7 @@ install_debugpy () {
         local create_venv_cmd
         create_venv_cmd="$PYTHON -m venv $DEBUGPY"
         if [[ $($create_venv_cmd) != 0 ]]; then
+            echo Need to install python*-venv
             # Need to install python*-venv
             # Get the * based on python* binary
             local path_to_curr_python
@@ -167,6 +177,7 @@ install_debugpy () {
             prefix=${path_to_curr_python%%"${PYTHON}"*}
             local idx_of_substr
             idx_of_substr=${#prefix}
+            echo Package to install: "${path_to_curr_python:$idx_of_substr}-venv"
             check_for_package_and_install "${path_to_curr_python:$idx_of_substr}-venv"
             $create_venv_cmd
         fi
@@ -186,6 +197,7 @@ install_dotnet () {
             rm packages-microsoft-prod.deb
             sudo apt-get install -y apt-transport-https && sudo apt-get update
             check_for_package_and_install ${DOTNET}
+            sudo apt install shellcheck
         fi
     fi
 }
@@ -194,11 +206,15 @@ install_telescope_deps () {
     echo Installing $TELESCOPE_DEPS...
     if [[ $DRY_RUN != 0 ]]; then
         check_for_package_and_install ripgrep
+        check_for_package_and_install fzf
         if [[ $OS =~ "Arch" ]]; then
             check_for_package_and_install fd
         elif [[ $OS =~ "Ubuntu" || $OS =~ "Debian" ]]; then
-            check_for_package_and_install fd-find
+            check_for_package_and_install 'fd-find'
             # b/c there's another package named fd
+            if [ ! -d ~/.local/bin ]; then
+            mkdir ~/.local/bin
+            fi
             ln -s "$(which fd-find)" ~/.local/bin/fd
         fi
     fi
@@ -261,7 +277,10 @@ install_nvim () {
 
 # Determine order of installation based on dependency graph (DFS)
 install_python
+install_pip
+$PIP install -U pytest
 INSTALL_ORDER=$($PYTHON get_install_order.py NVIM_DEPENDENCIES.json)
+echo Install order: "$INSTALL_ORDER"
 for binary in $INSTALL_ORDER; do
     ${INSTALL_FNS[$binary]}
 done
