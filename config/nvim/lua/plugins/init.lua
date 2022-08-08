@@ -72,7 +72,7 @@ return require('packer').startup({
         -- treesitter (syntax highlighting)
         use({
             'nvim-treesitter/nvim-treesitter',
-            run = ':TSUpdate',                    -- When upgrading the plugin, you must make sure that all installed parsers are updated to the latest version via :TSUpdate
+            run = function() require'nvim-treesitter.install'.update({ with_sync = true }) end, -- When upgrading the plugin, you must make sure that all installed parsers are updated to the latest version via :TSUpdate
             config = config("treesitter"),
             requires = {
                 'p00f/nvim-ts-rainbow',           -- rainbow parentheses
@@ -129,6 +129,7 @@ return require('packer').startup({
 
         -- indent
         use {'lukas-reineke/indent-blankline.nvim'}
+        use {'vimjas/vim-python-pep8-indent'}
 
         -- debugging
         use {"mfussenegger/nvim-dap", config = config("nvim-dap")}

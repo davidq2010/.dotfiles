@@ -5,7 +5,10 @@ require("nvim-treesitter.configs").setup({
         enable = true -- false will disable whole extension
         -- disable = { 'json' }, -- list of language that will be disabled
     },
-    indent = { enable = true },    -- experimental (indentation based on treesitter for = operator)
+    indent = {
+        enable = true,
+        disable = {"python"},
+    },    -- experimental (indentation based on treesitter for = operator)
 
     -- plugins
     autotag = { enable = true },
