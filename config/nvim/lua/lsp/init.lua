@@ -24,7 +24,7 @@ local default_on_attach = function(client, bufnr)
 	-- See `:help vim.lsp.*` for documentation on any of the below functions
 	-- https://github.com/neovim/nvim-lspconfig#suggested-configuration
 	u.buf_map("n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", nil, bufnr)
-	u.buf_map("n", "<C-k>", "<cmd>lua vim.lsp.buf.signature_help()<CR>", nil, bufnr)
+	u.buf_map("n", "<space>k", "<cmd>lua vim.lsp.buf.signature_help()<CR>", nil, bufnr)
 	u.buf_map("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>", nil, bufnr)
 	u.buf_map("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", nil, bufnr)
 	u.buf_map("n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>", nil, bufnr)
