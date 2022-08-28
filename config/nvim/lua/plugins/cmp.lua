@@ -22,26 +22,40 @@ local buffer_src_options =
 }
 
 local mapping =
-    {
-        ["<c-space>"] = cmp.mapping {
-            i = cmp.mapping.complete(),
-            c = function()
-                if cmp.visible() then
-                    if not cmp.confirm({ select = true })then
-                        return
-                    end
-                else
-                    cmp.complete()
+{
+    ["<C-space>"] = cmp.mapping {
+        i = cmp.mapping.complete(),
+        c = function()
+            if cmp.visible() then
+                if not cmp.confirm({ select = true })then
+                    return
                 end
-            end,
-        },
-        ["<C-e>"] = cmp.mapping({ i = cmp.mapping.abort(), c = cmp.mapping.close() }),
-        ["<CR>"] = cmp.mapping(cmp.mapping.confirm({ select = true }), { 'i', 'c' }),  -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
-        ['<C-b>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), { 'i', 'c' }),
-        ['<C-f>'] = cmp.mapping(cmp.mapping.scroll_docs(4), { 'i', 'c' }),
-        ['<C-p>'] = cmp.mapping(cmp.mapping.select_prev_item(), { 'i', 'c' }),
-        ['<C-n>'] = cmp.mapping(cmp.mapping.select_next_item(), { 'i', 'c' }),
-    }
+            else
+                cmp.complete()
+            end
+        end,
+    },
+    ["<C-e>"] = cmp.mapping({ i = cmp.mapping.abort(), c = cmp.mapping.close() }),
+    ["<CR>"] = cmp.mapping(cmp.mapping.confirm({ select = true }), { 'i', 'c' }),  -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+    ['<C-b>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), { 'i', 'c' }),
+    ['<C-f>'] = cmp.mapping(cmp.mapping.scroll_docs(4), { 'i', 'c' }),
+    ['<C-p>'] = cmp.mapping(cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }), { 'i', 'c' }),
+    ['<C-n>'] = cmp.mapping(cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }), { 'i', 'c' }),
+    ['<Tab>'] = {
+        c = function()
+            if cmp.visible() then
+                cmp.select_next_item()
+            end
+        end,
+    },
+    ['<S-Tab>'] = {
+      c = function()
+        if cmp.visible() then
+          cmp.select_prev_item()
+        end
+      end,
+    },
+}
 
 cmp.setup(
 {

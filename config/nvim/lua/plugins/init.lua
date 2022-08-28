@@ -119,7 +119,7 @@ return require('packer').startup({
         use {"windwp/nvim-autopairs", config = config("nvim-autopairs")}
 
         -- which-key
-        use {"folke/which-key.nvim"}
+        use {"folke/which-key.nvim", config = config("which-key")}
 
         -- tmux
         use {"christoomey/vim-tmux-navigator"}

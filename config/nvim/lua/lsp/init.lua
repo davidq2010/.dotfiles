@@ -3,11 +3,11 @@ local u = require("utils")
 local lsp = vim.lsp
 
 -- Diagnostic framework displays errors/warnings from external tools (e.g., linters, LSP servers)
-u.map("n", "[d", "<cmd>lua vim.diagnostic.goto_prev()<CR>", nil)
-u.map("n", "]d", "<cmd>lua vim.diagnostic.goto_next()<CR>", nil)
-u.map("n", "<space>e", "<cmd>lua vim.diagnostic.open_float()<CR>", nil)
-u.map("n", "<space>q", "<cmd>lua vim.diagnostic.setqflist()<CR>", nil) -- Add all diagnostics to quickfix list
-u.map("n", "<space>l", "<cmd>lua vim.diagnostic.setloclist()<CR>", nil) -- Add buffer diagnostics to location list
+u.map("n", "<space>dp", "<cmd>lua vim.diagnostic.goto_prev()<CR>", nil)
+u.map("n", "<space>dn", "<cmd>lua vim.diagnostic.goto_next()<CR>", nil)
+u.map("n", "<space>df", "<cmd>lua vim.diagnostic.open_float()<CR>", nil)
+u.map("n", "<space>dq", "<cmd>lua vim.diagnostic.setqflist()<CR>", nil) -- Add all diagnostics to quickfix list
+u.map("n", "<space>dl", "<cmd>lua vim.diagnostic.setloclist()<CR>", nil) -- Add buffer diagnostics to location list
 
 -- Set non-default global diagnostic visualization config values
 vim.diagnostic.config({ virtual_text = false })
@@ -23,20 +23,19 @@ local default_on_attach = function(client, bufnr)
 	-- Mappings
 	-- See `:help vim.lsp.*` for documentation on any of the below functions
 	-- https://github.com/neovim/nvim-lspconfig#suggested-configuration
-	u.buf_map("n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", nil, bufnr)
+	u.buf_map("n", "<space>K", "<cmd>lua vim.lsp.buf.hover()<CR>", nil, bufnr)
 	u.buf_map("n", "<space>k", "<cmd>lua vim.lsp.buf.signature_help()<CR>", nil, bufnr)
-	u.buf_map("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>", nil, bufnr)
-	u.buf_map("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", nil, bufnr)
-	u.buf_map("n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>", nil, bufnr)
-	u.buf_map("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<CR>", nil, bufnr)
+	u.buf_map("n", "<space>gD", "<cmd>lua vim.lsp.buf.declaration()<CR>", nil, bufnr)
+	u.buf_map("n", "<space>gd", "<cmd>lua vim.lsp.buf.definition()<CR>", nil, bufnr)
+	u.buf_map("n", "<space>gT", "<cmd>lua vim.lsp.buf.type_definition()<CR>", nil, bufnr)
+	u.buf_map("n", "<space>gr", "<cmd>lua vim.lsp.buf.references()<CR>", nil, bufnr)
+	u.buf_map("n", "<space>gi", "<cmd>lua vim.lsp.buf.implementation()<CR>", nil, bufnr)
 	u.buf_map("n", "<space>wa", "<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>", nil, bufnr)
 	u.buf_map("n", "<space>wr", "<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>", nil, bufnr)
 	u.buf_map("n", "<space>wl", "<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>", nil, bufnr)
-	u.buf_map("n", "<space>D", "<cmd>lua vim.lsp.buf.type_definition()<CR>", nil, bufnr)
 	u.buf_map("n", "<space>rn", "<cmd>lua vim.lsp.buf.rename()<CR>", nil, bufnr)
 	u.buf_map("n", "<space>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>", nil, bufnr)
 	u.buf_map("n", "<space>f", "<cmd>lua vim.lsp.buf.formatting()<CR>", nil, bufnr)
-	u.buf_map("n", "<space>ld", "<cmd>lua vim.diagnostic.open_float()<CR>", nil, bufnr)
 
 	require("illuminate").on_attach(client)
 
