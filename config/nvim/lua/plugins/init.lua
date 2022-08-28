@@ -148,6 +148,10 @@ return require('packer').startup({
             }
         }
 
+        -- image viewer
+        use {"samodostal/image.nvim", config = config("image"),
+            requires = {'nvim-lua/plenary.nvim'}}
+
         -- TODO: Add plugins for git
 
         -- Automatically set up your configuration after cloning packer.nvim
