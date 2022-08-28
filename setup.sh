@@ -272,6 +272,9 @@ install_clang () {
     echo Installing $CLANG...
     if [[ $DRY_RUN != 0 ]]; then
         check_for_package_and_install $CLANG
+        if [[ $OS =~ "Arch" ]]; then
+          check_for_package_and_install llvm
+        fi
     fi
 }
 
@@ -301,6 +304,11 @@ install_pylint () {
 install_nvim () {
     echo Installing $NVIM...
     if [[ $DRY_RUN != 0 ]]; then
+        if [[ $OS =~ "Arch" ]]; then
+            check_for_package_and_install fuse2
+        elif [[ $OS =~ "Ubuntu" || $OS =~ "Debian" ]]; then
+            check_for_package_and_install libfuse2
+        fi
         curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
         chmod u+x nvim.appimage
         sudo mv nvim.appimage /usr/local/bin/nvim
