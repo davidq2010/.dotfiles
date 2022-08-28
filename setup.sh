@@ -28,6 +28,7 @@ CLANG=clang
 GCC=gcc
 CPPCHECK=cppcheck
 PYLINT=pylint
+ASCII_IMAGE=ascii-image-converter
 NVIM=nvim
 
 # Map binaries to their installation functions
@@ -47,6 +48,7 @@ declare -A INSTALL_FNS=(
     [GCC]="install_gcc"
     [CPPCHECK]="install_cppcheck"
     [PYLINT]="install_pylint"
+    [ASCII_IMAGE]="install_ascii_image"
     [NVIM]="install_nvim"
 )
 
@@ -95,9 +97,9 @@ check_for_package_and_install() {
     if [[ $OS =~ "Ubuntu" || $OS =~ "Debian" ]]; then
         echo Installing using apt...
         # Only install if not on system
-        if ! sudo dpkg -s "$pkg" 2>&1 /dev/null; then
+        if ! sudo dpkg -s "$pkg" > /dev/null 2>&1; then
             echo "$pkg is not already installed, trying to install from package manager"
-            if apt-cache search --names-only "^${pkg}$" 2>&1 /dev/null; then
+            if apt-cache search --names-only "^${pkg}$" > /dev/null 2>&1; then
                 echo "Installing $pkg from package manager"
                 sudo apt --assume-yes --install-suggests install "$pkg"
             fi
@@ -107,10 +109,10 @@ check_for_package_and_install() {
         # Only install if not on system
         if ! pacman -Qi "$pkg"; then
             echo "$pkg is not already installed, trying to install from package manager"
-            if echo "$PACMAN_PACKAGES" | grep "^${pkg}$" 2>&1 /dev/null; then
+            if echo "$PACMAN_PACKAGES" | grep "^${pkg}$" > /dev/null 2>&1; then
                 echo "Installing $pkg from pacman repo"
                 yes | sudo pacman -S "$pkg"
-            elif echo "$AUR_PACKAGES" | grep "^${pkg}$" 2>&1 /dev/null; then
+            elif echo "$AUR_PACKAGES" | grep "^${pkg}$" > /dev/null 2>&1; then
                 echo "Installing $pkg from AUR"
                 [[ ! -d "$HOME/AURPackages" ]] && mkdir "$HOME/AURPackages"
                 # If couldn't cd, return failure code
@@ -125,6 +127,24 @@ check_for_package_and_install() {
 }
 
 # Installation functions
+install_ascii_image() {
+    echo Installing $ASCII_IMAGE
+    #https://github.com/TheZoraiz/ascii-image-converter
+    if [[ $DRY_RUN != 0 ]]; then
+        if [[ $OS =~ "Arch" ]]; then
+            check_for_package_and_install $ASCII_IMAGE-git
+        elif [[ $OS =~ "Ubuntu" || $OS =~ "Debian" ]]; then
+            filepath='/etc/apt/sources.list.d/ascii-image-converter.list'
+            if [ ! -s $filepath ]; then
+                echo hello
+                echo 'deb [trusted=yes] https://apt.fury.io/ascii-image-converter/ /' | sudo tee $filepath
+                sudo apt update
+            fi
+            check_for_package_and_install $ASCII_IMAGE
+        fi
+    fi
+}
+
 install_curl () {
     echo Installing $CURL...
     if [[ $DRY_RUN != 0 ]]; then
@@ -141,13 +161,20 @@ install_cmake () {
 
 install_npm () {
     echo Installing $NPM...
-    # TODO: Update when necessary
     if [[ $DRY_RUN != 0 ]]; then
-        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-        nvm install --lts
-        export NVM_DIR="$HOME/.nvm"
+        # TODO: Update when necessary
+        nvm_ver="0.39.1"
         [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-        [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+        if ! command -v nvm >/dev/null 2>&1 || [[ $(nvm --version) != "$nvm_ver" ]]; then
+            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v$nvm_ver/install.sh | bash
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+        fi
+        # If node is not installed or the latest lts node is not installed
+        if (! command -v node >/dev/null 2>&1) || (! nvm ls lts/* >/dev/null 2>&1); then
+            nvm install --lts
+        fi
     fi
 }
 
@@ -177,15 +204,15 @@ install_debugpy () {
             echo Need to install python*-venv
             # Need to install python*-venv
             # Get the * based on python* binary
-            local path_to_curr_python
+            local path_to_curr_sys_python
             # The 'python3' binary is usually symlinked to a different binary, like 'python3.10'
-            path_to_curr_python=$(readlink -f "$(which $PYTHON)")
+            path_to_curr_sys_python=$(readlink -f /bin/$PYTHON)
             local prefix
-            prefix=${path_to_curr_python%%"${PYTHON}"*}
+            prefix=${path_to_curr_sys_python%%"${PYTHON}"*}
             local idx_of_substr
             idx_of_substr=${#prefix}
-            echo Package to install: "${path_to_curr_python:$idx_of_substr}-venv"
-            check_for_package_and_install "${path_to_curr_python:$idx_of_substr}-venv"
+            echo Package to install: "${path_to_curr_sys_python:$idx_of_substr}-venv"
+            check_for_package_and_install "${path_to_curr_sys_python:$idx_of_substr}-venv"
             $create_venv_cmd
         fi
         $DEBUGPY/bin/$PYTHON -m pip install debugpy
@@ -195,17 +222,11 @@ install_debugpy () {
 
 install_dotnet () {
     echo Installing $DOTNET...
+    # Can see what outside apt repositories were added via /etc/apt/sources.list.d
     if [[ $DRY_RUN != 0 ]]; then
-        if [[ $OS =~ "Arch" ]]; then
-            check_for_package_and_install $DOTNET
-        elif [[ $OS =~ "Ubuntu" || $OS =~ "Debian" ]]; then
-            wget https://packages.microsoft.com/config/debian/11/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
-            sudo dpkg -i packages-microsoft-prod.deb
-            rm packages-microsoft-prod.deb
-            sudo apt-get install -y apt-transport-https && sudo apt-get update
-            check_for_package_and_install ${DOTNET}
-            sudo apt install shellcheck
-        fi
+        # https://github.com/dotnet/core/issues/7699
+        # Ubuntu 22.04 has dotnet now
+        check_for_package_and_install $DOTNET
     fi
 }
 
@@ -219,10 +240,10 @@ install_telescope_deps () {
         elif [[ $OS =~ "Ubuntu" || $OS =~ "Debian" ]]; then
             check_for_package_and_install 'fd-find'
             # b/c there's another package named fd
-            if [ ! -d ~/.local/bin ]; then
-            mkdir ~/.local/bin
+            [ ! -d ~/.local/bin ] && mkdir ~/.local/bin
+            if [ ! -s ~/.local/bin/fd ]; then
+                ln -s "$(which fdfind)" ~/.local/bin/fd
             fi
-            ln -s "$(which fd-find)" ~/.local/bin/fd
         fi
     fi
 }
@@ -241,7 +262,9 @@ install_stylua () {
 install_eslint () {
     echo Installing $ESLINT...
     if [[ $DRY_RUN != 0 ]]; then
-        sudo npm install --location=global eslint
+        if ! command -v $ESLINT >/dev/null 2>&1; then
+            sudo npm install --location=global $ESLINT
+        fi
     fi
 }
 
@@ -269,7 +292,9 @@ install_cppcheck () {
 install_pylint () {
     echo Installing $PYLINT...
     if [[ $DRY_RUN != 0 ]]; then
-        $PIP install $PYLINT
+        if ! command -v $PYLINT >/dev/null 2>&1; then
+            $PIP install $PYLINT
+        fi
     fi
 }
 

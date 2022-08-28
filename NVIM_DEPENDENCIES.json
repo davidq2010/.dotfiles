@@ -13,5 +13,6 @@
         "CURL": [],
         "CMAKE": [],
         "NPM": ["CURL"],
-        "NVIM": ["CURL", "NPM", "CMAKE", "PYTHON", "PIP", "DEBUGPY", "DOTNET", "TELESCOPE_DEPS", "STYLUA", "ESLINT", "CLANG", "GCC", "CPPCHECK", "PYLINT"]
+        "ASCII_IMAGE": [],
+        "NVIM": ["CURL", "NPM", "CMAKE", "PYTHON", "PIP", "DEBUGPY", "DOTNET", "TELESCOPE_DEPS", "STYLUA", "ESLINT", "CLANG", "GCC", "CPPCHECK", "PYLINT", "ASCII_IMAGE"]
 }
