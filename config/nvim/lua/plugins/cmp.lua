@@ -1,7 +1,3 @@
-local cmp = require("cmp")
-local luasnip = require("luasnip")
-local lspkind = require("lspkind")
-
 local buffer_src_options =
 {
     keyword_length = 3,  -- num chars a word must have to appear in autocomplete
@@ -17,47 +13,46 @@ local buffer_src_options =
                 bufs[vim.api.nvim_win_get_buf(win)] = true
             end
         end
-        return vim.tbl_keys(bufs)
-    end
+        return vim.tbl_keys(bufs) end
 }
 
 local mapping =
 {
-    ["<C-space>"] = cmp.mapping {
-        i = cmp.mapping.complete(),
+    ["<C-space>"] = require('cmp').mapping {
+        i = require('cmp').mapping.complete(),
         c = function()
-            if cmp.visible() then
-                if not cmp.confirm({ select = true })then
+            if require('cmp').visible() then
+                if not require('cmp').confirm({ select = true })then
                     return
                 end
             else
-                cmp.complete()
+                require('cmp').complete()
             end
         end,
     },
-    ["<C-e>"] = cmp.mapping({ i = cmp.mapping.abort(), c = cmp.mapping.close() }),
-    ["<CR>"] = cmp.mapping(cmp.mapping.confirm({ select = true }), { 'i', 'c' }),  -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
-    ['<C-b>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), { 'i', 'c' }),
-    ['<C-f>'] = cmp.mapping(cmp.mapping.scroll_docs(4), { 'i', 'c' }),
-    ['<C-p>'] = cmp.mapping(cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }), { 'i', 'c' }),
-    ['<C-n>'] = cmp.mapping(cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }), { 'i', 'c' }),
+    ["<C-e>"] = require('cmp').mapping({ i = require('cmp').mapping.abort(), c = require('cmp').mapping.close() }),
+    ["<CR>"] = require('cmp').mapping(require('cmp').mapping.confirm({ select = true }), { 'i', 'c' }),  -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+    ['<C-b>'] = require('cmp').mapping(require('cmp').mapping.scroll_docs(-4), { 'i', 'c' }),
+    ['<C-f>'] = require('cmp').mapping(require('cmp').mapping.scroll_docs(4), { 'i', 'c' }),
+    ['<C-p>'] = require('cmp').mapping(require('cmp').mapping.select_prev_item({ behavior = require('cmp').SelectBehavior.Select }), { 'i', 'c' }),
+    ['<C-n>'] = require('cmp').mapping(require('cmp').mapping.select_next_item({ behavior = require('cmp').SelectBehavior.Select }), { 'i', 'c' }),
     ['<Tab>'] = {
         c = function()
-            if cmp.visible() then
-                cmp.select_next_item()
+            if require('cmp').visible() then
+                require('cmp').select_next_item()
             end
         end,
     },
     ['<S-Tab>'] = {
       c = function()
-        if cmp.visible() then
-          cmp.select_prev_item()
+        if require('cmp').visible() then
+          require('cmp').select_prev_item()
         end
       end,
     },
 }
 
-cmp.setup(
+require('cmp').setup(
 {
     view =
     {
@@ -72,12 +67,12 @@ cmp.setup(
     snippet =
     {
         expand = function(args)
-            luasnip.lsp_expand(args.body)
+            require('luasnip').lsp_expand(args.body)
         end
     },
     formatting =
     {
-        format = lspkind.cmp_format(
+        format = require('lspkind').cmp_format(
         {
             with_text = true,
             menu =
@@ -113,7 +108,7 @@ cmp.setup(
 })
 
 -- In / cmdline mode, use a horizontal completion menu
-cmp.setup.cmdline('/', {
+require('cmp').setup.cmdline('/', {
     view = {
         entries = { name = "wildmenu", separator = '|' }
     },
@@ -124,7 +119,7 @@ cmp.setup.cmdline('/', {
 })
 
 -- : cmdline setup
-cmp.setup.cmdline(':', {
+require('cmp').setup.cmdline(':', {
     view = {
         entries = { name = "custom" }
     },
@@ -136,7 +131,7 @@ cmp.setup.cmdline(':', {
 })
 
 -- Set config for lua filetype
-cmp.setup.filetype('lua', {
+require('cmp').setup.filetype('lua', {
     sources =
     {
         { name = "nvim_lua" }
@@ -145,8 +140,8 @@ cmp.setup.filetype('lua', {
 
 --[[
 -- Set configuration for specific filetype.
-cmp.setup.filetype('gitcommit', {
-    sources = cmp.config.sources({
+require('cmp').setup.filetype('gitcommit', {
+    sources = require('cmp').config.sources({
         { name = 'cmp_git' }, -- You can specify the `cmp_git` source if you were installed it.
     }, {
         { name = 'buffer' },

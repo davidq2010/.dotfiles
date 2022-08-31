@@ -27,6 +27,7 @@ return require('packer').startup({
         -- lsp
         use({
             "neovim/nvim-lspconfig", -- makes lsp configuration easier
+            event = "BufRead",
             requires = {
                 "williamboman/nvim-lsp-installer",  -- makes lsp server installation easier
                 'b0o/schemastore.nvim',             -- more JSON schemas for jsonls
@@ -49,25 +50,27 @@ return require('packer').startup({
         --]]
         use({
             "hrsh7th/nvim-cmp",
+            event = "BufWinEnter",
             config = config("cmp"),
             requires = {
-                "hrsh7th/cmp-nvim-lsp",     -- nvim's built-in language server client w/more client capabilities (more types of completion candidates for language server's completion Requests)
-                "hrsh7th/cmp-buffer",       -- autocomplete from local buffer
-                "hrsh7th/cmp-path",         -- filepaths autocomplete
-                "hrsh7th/cmp-cmdline",      -- vim's cmdline
-                "hrsh7th/cmp-nvim-lua",     -- nvim lua autocomplete
+                {"hrsh7th/cmp-nvim-lsp", after = "nvim-cmp"},     -- nvim's built-in language server client w/more client capabilities (more types of completion candidates for language server's completion Requests)
+                {"hrsh7th/cmp-buffer",   after = "nvim-cmp"},       -- autocomplete from local buffer
+                {"hrsh7th/cmp-path",     after = "nvim-cmp"},         -- filepaths autocomplete
+                {"hrsh7th/cmp-cmdline",  after = "nvim-cmp"},      -- vim's cmdline
+                {"hrsh7th/cmp-nvim-lua", after = "nvim-cmp"},     -- nvim lua autocomplete
                 --"andersevenrud/cmp-tmux",
-                "onsails/lspkind-nvim",     -- for completion menu formatting
-                {
-                    -- Snippets
-                    "L3MON4D3/LuaSnip",
-                    requires = {
-                        "saadparwaiz1/cmp_luasnip", -- for luasnip to be used by cmp
-                        --"rafamadriz/friendly-snippets" -- VSCode snippets
-                    }
-                }
+                "onsails/lspkind-nvim"     -- for completion menu formatting
             },
         })
+
+        use {
+            "L3MON4D3/LuaSnip",
+            after = "nvim-cmp",
+            requires = {
+                {"saadparwaiz1/cmp_luasnip", after = "LuaSnip"}, -- for luasnip to be used by cmp
+                --"rafamadriz/friendly-snippets" -- VSCode snippets
+            }
+        }
 
         -- treesitter (syntax highlighting)
         use({
@@ -75,9 +78,9 @@ return require('packer').startup({
             run = function() require'nvim-treesitter.install'.update({ with_sync = true }) end, -- When upgrading the plugin, you must make sure that all installed parsers are updated to the latest version via :TSUpdate
             config = config("treesitter"),
             requires = {
-                'p00f/nvim-ts-rainbow',           -- rainbow parentheses
-                'windwp/nvim-ts-autotag',         -- auto-pair tags
-                'JoosepAlviste/nvim-ts-context-commentstring',
+                {'p00f/nvim-ts-rainbow', after = "nvim-treesitter"},           -- rainbow parentheses
+                {'windwp/nvim-ts-autotag', after = "nvim-treesitter"},         -- auto-pair tags
+                {'JoosepAlviste/nvim-ts-context-commentstring', after = "nvim-treesitter"},
             },
         })
 
@@ -116,7 +119,9 @@ return require('packer').startup({
         use({ "numToStr/Comment.nvim", config = config("comment") })
 
         -- autopairs
-        use {"windwp/nvim-autopairs", config = config("nvim-autopairs")}
+        use {"windwp/nvim-autopairs", config = config("nvim-autopairs"),
+            after = "nvim-cmp"
+        }
 
         -- which-key
         use {"folke/which-key.nvim", config = config("which-key")}
@@ -129,21 +134,25 @@ return require('packer').startup({
 
         -- indent
         use {'lukas-reineke/indent-blankline.nvim'}
-        use {'vimjas/vim-python-pep8-indent'}
+        use {'vimjas/vim-python-pep8-indent', ft = "py"}
 
         -- debugging
-        use {"mfussenegger/nvim-dap", config = config("nvim-dap")}
-        use {"rcarriga/nvim-dap-ui", config = config("nvim-dap-ui")}
-        use {"theHamsta/nvim-dap-virtual-text", config = config("nvim-dap-virtual-text")}
-        use {"nvim-telescope/telescope-dap.nvim"}
         use {
-            'mfussenegger/nvim-dap-python', config = config("nvim-dap-python"),
+            "mfussenegger/nvim-dap", config = config("nvim-dap"),
             requires = {
                 {
-                    'nvim-treesitter/nvim-treesitter'
+                    "rcarriga/nvim-dap-ui", config = config("nvim-dap-ui")
                 },
                 {
-                    "mfussenegger/nvim-dap"
+                    "theHamsta/nvim-dap-virtual-text", config = config("nvim-dap-virtual-text")
+                },
+                {
+                    "nvim-telescope/telescope-dap.nvim",
+                    requires = { "nvim-telescope/telescope.nvim", "nvim-treesitter/nvim-treesitter" }
+                },
+                {
+                    'mfussenegger/nvim-dap-python', config = config("nvim-dap-python"),
+                    requires = { "nvim-treesitter/nvim-treesitter" }
                 }
             }
         }
