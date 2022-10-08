@@ -27,9 +27,13 @@ return require('packer').startup({
         -- lsp
         use({
             "neovim/nvim-lspconfig", -- makes lsp configuration easier
-            event = "BufRead",
+            --event = "BufRead",
             requires = {
-                "williamboman/nvim-lsp-installer",  -- makes lsp server installation easier
+                {
+                    "williamboman/mason.nvim",  -- makes lsp server installation easier
+                    config = config("mason")
+                },
+                "williamboman/mason-lspconfig.nvim",
                 'b0o/schemastore.nvim',             -- more JSON schemas for jsonls
                 {
                     "RRethy/vim-illuminate",            -- intelligently highlight and jump to variable instances/definition
@@ -50,14 +54,14 @@ return require('packer').startup({
         --]]
         use({
             "hrsh7th/nvim-cmp",
-            event = "BufWinEnter",
+            --event = "BufWinEnter",
             config = config("cmp"),
             requires = {
-                {"hrsh7th/cmp-nvim-lsp", after = "nvim-cmp"},     -- nvim's built-in language server client w/more client capabilities (more types of completion candidates for language server's completion Requests)
-                {"hrsh7th/cmp-buffer",   after = "nvim-cmp"},       -- autocomplete from local buffer
-                {"hrsh7th/cmp-path",     after = "nvim-cmp"},         -- filepaths autocomplete
-                {"hrsh7th/cmp-cmdline",  after = "nvim-cmp"},      -- vim's cmdline
-                {"hrsh7th/cmp-nvim-lua", after = "nvim-cmp"},     -- nvim lua autocomplete
+                {"hrsh7th/cmp-nvim-lsp"},     -- nvim's built-in language server client w/more client capabilities (more types of completion candidates for language server's completion Requests)
+                {"hrsh7th/cmp-buffer"},       -- autocomplete from local buffer
+                {"hrsh7th/cmp-path"},         -- filepaths autocomplete
+                {"hrsh7th/cmp-cmdline"},      -- vim's cmdline
+                {"hrsh7th/cmp-nvim-lua"},     -- nvim lua autocomplete
                 --"andersevenrud/cmp-tmux",
                 "onsails/lspkind-nvim"     -- for completion menu formatting
             },
@@ -65,9 +69,9 @@ return require('packer').startup({
 
         use {
             "L3MON4D3/LuaSnip",
-            after = "nvim-cmp",
+            --after = "nvim-cmp",
             requires = {
-                {"saadparwaiz1/cmp_luasnip", after = "LuaSnip"}, -- for luasnip to be used by cmp
+                {"saadparwaiz1/cmp_luasnip"}, -- for luasnip to be used by cmp
                 --"rafamadriz/friendly-snippets" -- VSCode snippets
             }
         }

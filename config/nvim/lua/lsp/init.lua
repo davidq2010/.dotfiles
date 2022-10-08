@@ -19,6 +19,21 @@ local border_opts = { border = "single", focusable = false }
 lsp.handlers["textDocument/signatureHelp"] = lsp.with(lsp.handlers.signature_help, border_opts)
 lsp.handlers["textDocument/hover"] = lsp.with(lsp.handlers.hover, border_opts)
 
+local lsp_formatting = function(bufnr)
+    vim.lsp.buf.format({
+        filter = function(client)
+            -- apply whatever logic you want (in this example, we'll only use null-ls)
+            -- https://github.com/jose-elias-alvarez/null-ls.nvim#how-do-i-stop-neovim-from-asking-me-which-server-i-want-to-use-for-formatting
+            -- https://github.com/jose-elias-alvarez/null-ls.nvim/wiki/Avoiding-LSP-formatting-conflicts
+            return client.name == "null-ls"
+        end,
+        bufnr = bufnr,
+    })
+end
+
+-- if you want to set up formatting on save, you can use this as a callback
+local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
+
 local default_on_attach = function(client, bufnr)
 	-- Mappings
 	-- See `:help vim.lsp.*` for documentation on any of the below functions
@@ -38,19 +53,31 @@ local default_on_attach = function(client, bufnr)
 	u.buf_map("n", "<space>f", "<cmd>lua vim.lsp.buf.formatting()<CR>", nil, bufnr)
 
 	require("illuminate").on_attach(client)
-
-	-- https://github.com/jose-elias-alvarez/null-ls.nvim#how-do-i-stop-neovim-from-asking-me-which-server-i-want-to-use-for-formatting
-	if client.name ~= "null-ls" then
-		client.resolved_capabilities.document_formatting = false
-		client.resolved_capabilities.document_range_formatting = false
-	end
+    if client.supports_method("textDocument/formatting") then
+        vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
+        vim.api.nvim_create_autocmd("BufWritePre", {
+            group = augroup,
+            buffer = bufnr,
+            callback = function()
+                lsp_formatting(bufnr)
+            end,
+        })
+    end
 end
 
-local lsp_installer = require("nvim-lsp-installer")
+local opts = {
+    on_attach = default_on_attach,
+    capabilities = vim.lsp.protocol.make_client_capabilities()
+}
+opts.capabilities = require("cmp_nvim_lsp").update_capabilities(opts.capabilities)
+
+--local mason_status_ok, mason_lspconfig = pcall(require, "mason_lspconfig")
+local mason_lspconfig = require("mason-lspconfig")
+mason_lspconfig.setup({ ensure_installed = servers, automatic_installation = true })
 
 local servers = {
     "bashls",
-    "ccls",
+    "clangd",
 	'cssls',
 	"jsonls",
     "omnisharp",
@@ -60,44 +87,62 @@ local servers = {
 	'tsserver'
 }
 
--- These are based on schemas, which you can see by :LspInstallInfo and expanding installed servers -> schemas
--- Can also look under https://github.com/williamboman/nvim-lsp-installer/tree/main/lua/nvim-lsp-installer/_generated/schemas
-local special_config = {
-	jsonls = {
-		settings = {
-			json = {
-				schemas = require("schemastore").json.schemas(),
-			},
-		},
-	},
-	["sumneko_lua"] = {
-		settings = {
-			Lua = {
-				diagnostics = {
-					globals = { "vim" },  -- define 'vim' as a global for diagnostics (so no warning about undefined var)
-				},
-			},
-		},
-	},
-}
+mason_lspconfig.setup_handlers({
+    -- The first entry (without a key) will be the default handler
+    -- and will be called for each installed server that doesn't have
+    -- a dedicated handler.
+    function(server_name) -- Default handler (optional)
+        require('lspconfig')[server_name].setup {
+            on_attach = opts.on_attach,
+            capabilities = opts.capabilities,
+        }
+    end,
+    ["sumneko_lua"] = function()
+        require('lspconfig')['sumneko_lua'].setup({
+            on_attach = opts.on_attach,
+            capabilities = opts.capabilities,
+            settings = {
+                Lua = {
+                    -- Tells Lua that a global variable named vim exists to not have warnings when configuring neovim
+                    diagnostics = {
+                    globals = { "vim" },
+                    },
+                    workspace = {
+                        library = {
+                            [vim.fn.expand("$VIMRUNTIME/lua")] = true,
+                            [vim.fn.stdpath("config") .. "/lua"] = true,
+                        },
+                    },
+                },
+            },
+        })
+    end,
+    ["pyright"] = function()
+        require('lspconfig')['pyright'].setup({
+            on_attach = opts.on_attach,
+            capabilities = opts.capabilities,
 
--- automatically install missing language servers
-for _, name in pairs(servers) do
-	local server_is_found, server = lsp_installer.get_server(name)
-	if server_is_found and not server:is_installed() then
-		print("Installing " .. name)
-		server:install()
-	end
-end
+            settings = {
+                python = {
+                    analysis = {
+                        -- Disable strict type checking
+                        typeCheckingMode = "off"
+                    }
+                }
+            },
+        })
+    end,
+    ["jsonls"] = function()
+        -- Find more schemas here: https://www.schemastore.org/json/
+        require('lspconfig')['jsonls'].setup({
+            on_attach = opts.on_attach,
+            capabilities = opts.capabilities,
 
-lsp_installer.on_server_ready(function(server)
-	local config = special_config[server.name] or {}
-	-- tell server what the client's (i.e., nvim's) completion capabilities are
-	config.capabilities = vim.lsp.protocol.make_client_capabilities()
-	-- override some of nvim's default capabilities w/cmp_nvim_lsp's broader capabilities
-	config.capabilities = require("cmp_nvim_lsp").update_capabilities(config.capabilities)
-
-	-- set on_attach handler
-	config.on_attach = default_on_attach
-	server:setup(config)
-end)
+            settings = {
+                json = {
+                    schemas = require("schemastore").json.schemas(),
+                },
+            },
+        })
+    end,
+})
