@@ -27,12 +27,10 @@ return require('packer').startup({
         -- lsp
         use({
             "neovim/nvim-lspconfig", -- makes lsp configuration easier
-            --event = "BufRead",
             requires = {
                 {
                     "williamboman/mason.nvim",  -- makes lsp server installation easier
                     run = ":MasonUpdate",
-                    config = config("mason")
                 },
                 "williamboman/mason-lspconfig.nvim",
                 'b0o/schemastore.nvim',             -- more JSON schemas for jsonls
