@@ -102,11 +102,11 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 # See /usr/share/doc/bash-doc/examples in the bash-doc package.
 
 if [ -f ~/.bash_aliases ]; then
-    . ~/.bash_aliases
+  . ~/.bash_aliases
 fi
 
 if [ -f ~/.bash_aliases_personal ]; then
-    . ~/.bash_aliases_personal
+  . ~/.bash_aliases_personal
 fi
 
 # enable programmable completion features (you don't need to enable
@@ -136,6 +136,10 @@ else
 fi
 unset __conda_setup
 # <<< conda initialize <<<
+
+if [ -f ~/.bash_tmux_conda ]; then
+  . ~/.bash_tmux_conda
+fi
 
 # add WSL to .bashrc
 export DISPLAY=localhost:0.0
