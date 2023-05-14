@@ -141,8 +141,10 @@ if [ -f ~/.bash_tmux_conda ]; then
   . ~/.bash_tmux_conda
 fi
 
-# add WSL to .bashrc
-export DISPLAY=localhost:0.0
+# add WSL X Server support to .bashrc
+if [[ ! -z "$WSLENV" ]]; then
+  export DISPLAY=localhost:0.0
+fi
 
 figlet "Welcome $USER"
 
