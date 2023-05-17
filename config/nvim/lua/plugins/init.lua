@@ -25,28 +25,27 @@ return require("packer").startup({
 			return string.format("require('plugins.%s')", name)
 		end
 
-		-- lsp
-		use({
-			"neovim/nvim-lspconfig", -- makes lsp configuration easier
-			--event = "BufRead",
-			requires = {
-				{
-					"williamboman/mason.nvim", -- makes lsp server installation easier
-					config = config("mason"),
-				},
-				"williamboman/mason-lspconfig.nvim",
-				"b0o/schemastore.nvim", -- more JSON schemas for jsonls
-				{
-					"RRethy/vim-illuminate", -- intelligently highlight and jump to variable instances/definition
-					config = config("illuminate"),
-				},
-				{
-					"jose-elias-alvarez/null-ls.nvim", -- formatter
-					config = config("null-ls"),
-					requires = { "nvim-lua/plenary.nvim" },
-				},
-			},
-		})
+        -- lsp
+        use({
+            "neovim/nvim-lspconfig", -- makes lsp configuration easier
+            requires = {
+                {
+                    "williamboman/mason.nvim",  -- makes lsp server installation easier
+                    run = ":MasonUpdate",
+                },
+                "williamboman/mason-lspconfig.nvim",
+                'b0o/schemastore.nvim',             -- more JSON schemas for jsonls
+                {
+                    "RRethy/vim-illuminate",            -- intelligently highlight and jump to variable instances/definition
+                    config = config("illuminate"),
+                },
+                {
+                    'jose-elias-alvarez/null-ls.nvim',  -- formatter
+                    config = config("null-ls"),
+                    requires = { "nvim-lua/plenary.nvim" }
+                }
+            }
+        })
 
 		-- completion
 		--[[
@@ -169,9 +168,6 @@ return require("packer").startup({
 				},
 			},
 		})
-
-		-- image viewer
-		use({ "samodostal/image.nvim", config = config("image"), requires = { "nvim-lua/plenary.nvim" } })
 
 		use({ "tpope/vim-fugitive" })
 

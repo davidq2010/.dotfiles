@@ -82,11 +82,12 @@ local servers = {
 	"omnisharp",
 	"pyright",
 	--'eslint',
-	"sumneko_lua",
+	"lua_ls",
 	"tsserver",
 }
 
 --local mason_status_ok, mason_lspconfig = pcall(require, "mason_lspconfig")
+require("mason").setup()
 local mason_lspconfig = require("mason-lspconfig")
 mason_lspconfig.setup({ ensure_installed = servers, automatic_installation = true })
 
@@ -108,8 +109,8 @@ mason_lspconfig.setup_handlers({
 			capabilities = updated_capabilities,
 		})
 	end,
-	["sumneko_lua"] = function()
-		require("lspconfig")["sumneko_lua"].setup({
+	["lua_ls"] = function()
+		require("lspconfig")["lua_ls"].setup({
 			on_attach = opts.on_attach,
 			capabilities = opts.capabilities,
 			settings = {
