@@ -42,7 +42,6 @@ if [[ -n "$TMUX_PARENT_PANE_ID" ]]; then
     if [ $? -eq 0 ]; then
         PATT="(?<=${TMUX_PARENT_PANE_ID}:).*?(?=([[:space:]]|$))"
         PARENT_CONDA_ENV=$(echo $TMUX_SESSION_CONDA_ENVS | grep -oP "$PATT" | head -1)
-        echo "Activate conda env '$PARENT_CONDA_ENV' of parent tmux pane '$TMUX_PARENT_PANE_ID'"
         conda activate $PARENT_CONDA_ENV
     fi
     # Clean up the pane's env (TMUX_SESSION_CONDA_ENVS remains in the tmux session env)
