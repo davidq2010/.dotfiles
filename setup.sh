@@ -30,6 +30,7 @@ CPPCHECK=cppcheck
 PYLINT=pylint
 ASCII_IMAGE=ascii-image-converter
 NVIM=nvim
+DIRENV=direnv
 
 # Map binaries to their installation functions
 # https://stackoverflow.com/questions/5672289/bash-pass-a-function-as-parameter
@@ -50,6 +51,7 @@ declare -A INSTALL_FNS=(
     [PYLINT]="install_pylint"
     [ASCII_IMAGE]="install_ascii_image"
     [NVIM]="install_nvim"
+    [DIRENV]="install_direnv"
 )
 
 # Determine system package installer based on OS
@@ -289,6 +291,13 @@ install_cppcheck () {
     echo Installing $CPPCHECK...
     if [[ $DRY_RUN != 0 ]]; then
         check_for_package_and_install $CPPCHECK
+    fi
+}
+
+install_direnv () {
+    echo Installing $DIRENV...
+    if [[ $DRY_RUN != 0 ]]; then
+        check_for_package_and_install $DIRENV
     fi
 }
 
