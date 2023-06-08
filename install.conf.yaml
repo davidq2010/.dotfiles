@@ -17,3 +17,5 @@
     ~/.config/nvim/:
       glob: true
       path: config/nvim/*
+    ~/.config/direnv/direnvrc:
+      path: config/direnv/direnvrc

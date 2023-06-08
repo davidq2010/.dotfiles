@@ -65,10 +65,10 @@ unset color_prompt force_color_prompt
 
 # If this is an xterm set the title to user@host:dir
 case "$TERM" in
-xterm*|rxvt*)
-    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+  xterm*|rxvt*)
+    PS1='\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]'"$PS1"
     ;;
-*)
+  *)
     ;;
 esac
 
@@ -152,7 +152,19 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
+
 # Hook direnv if it exists
-if [ -x "$(direnv)" ]; then
+if command -v direnv >/dev/null 2>&1; then
+  # https://github.com/direnv/direnv/wiki/Python#bash
+  # Show conda env in PS1
+  show_virtual_env() {
+    if [[ -n "$VIRTUAL_ENV" && -n "$DIRENV_DIR" ]]; then
+      echo "($(basename $VIRTUAL_ENV))"
+    elif [[ -n "$CONDA_DEFAULT_ENV" && -n "$DIRENV_DIR" ]]; then
+      echo "($(basename $CONDA_DEFAULT_ENV))"
+    fi
+  }
+  export -f show_virtual_env
+  PS1='$(show_virtual_env)'$PS1
   eval "$(direnv hook bash)"
 fi

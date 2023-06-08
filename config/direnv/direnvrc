@@ -1,8 +1,5 @@
 # Taken from https://humanscode.com/better-python-environment-management-for-anaconda
 layout_anaconda() {
-  #local ANACONDA_HOME="${HOME}/miniconda" # Make sure this points to path of your conda install
-  #PATH_add "$ANACONDA_HOME"/bin
-
   if [ -n "$1" ]; then
     # Explicit environment name from layout command.
     local env_name="$1"
