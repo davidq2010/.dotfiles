@@ -336,3 +336,5 @@ for binary in $INSTALL_ORDER; do
         exit 1
     fi
 done
+
+install_direnv
