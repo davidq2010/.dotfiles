@@ -17,28 +17,25 @@ vim.opt.rtp:prepend(install_path)
 -- Register % contains name of current file
 require("lazy").setup(
 	-- plugins
-	{ 
+	{
 		{
 			import = "plugins",
 		},
 		{
-			import = "lsp"
-		}
+			import = "lsp",
+		},
 	},
 	-- opts
 	{
-		install = 
-		{
-			colorscheme = { "dracula" }
+		install = {
+			colorscheme = { "dracula" },
 		},
-		checker = 
-		{
+		checker = {
 			enabled = true,
-			notify = false
+			notify = false,
 		},
-		change_detection = 
-		{
-			notify = false
-		}
+		change_detection = {
+			notify = false,
+		},
 	}
 )

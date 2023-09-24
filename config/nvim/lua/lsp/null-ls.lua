@@ -5,9 +5,8 @@ return {
 	dependencies = { "nvim-lua/plenary.nvim" },
 	config = function()
 		local null_ls = require("null-ls")
-
 		local lsp_formatting = function(bufnr)
-			lsp.buf.format({
+			vim.lsp.buf.format({
 				filter = function(client)
 					-- apply whatever logic you want (in this example, we'll only use null-ls)
 					-- https://github.com/jose-elias-alvarez/null-ls.nvim#how-do-i-stop-neovim-from-asking-me-which-server-i-want-to-use-for-formatting
