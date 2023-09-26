@@ -1,0 +1,16 @@
+To try:
+- stevearc/dressing.nvim | Better select UI (also sth w/Telescope code actions?)
+- szw/vim-maximizer | Min/max splits
+- nvim-tree/nvim-tree.lua | Nvim file explorer
+
+Proj idea: Auto update the info below by getting first sentence from README of each git repo on plugin updates.
+
+Installed:
+- RRethy/vim-illuminate
+- numToStr/Comment.nvim
+- ibhagwan/fzf-lua
+- windwp/nvim-autopairs
+- nvim-telescope/telescope.nvim
+- folke/which-key.nvim
+- mfussenegger/nvim-dap
+- nvim-lualine/lualine.nvim
