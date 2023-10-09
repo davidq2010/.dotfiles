@@ -6,37 +6,23 @@ mkcd() {
 }
 
 cdl() {
-  all=false
+  args=
   directory=
-  while [[ "$1" != "" ]]; do
-    case $1 in
-      -a | --all )    all=true
-                      ;;
-      * )             directory="$1"
-                      ;;
-    esac
-    shift
+  for arg in "$@"; do
+    if [[ "$arg" = -* ]]; then
+      if [ ! -z "$args" ]; then
+        args+=" $arg"
+      else
+        args+="$arg"
+      fi
+    else
+      directory=$arg
+    fi
   done
 
-  if [[ $all = true ]]; then
-    cd -- $directory && ls -a
+  if [ -z "$args" ]; then
+    cd "$directory" && ls
   else
-    cd -- $directory && ls
+    cd "$directory" && ls $args
   fi
-}
-
-cdla() {
-  all=false
-  directory=
-  while [[ "$1" != "" ]]; do
-    case $1 in
-      -a | --all )    all=true
-                      ;;
-      * )             directory="$1"
-                      ;;
-    esac
-    shift
-  done
-
-  cd -- $directory && la
 }
