@@ -28,7 +28,6 @@ CLANG=clang
 GCC=gcc
 CPPCHECK=cppcheck
 PYLINT=pylint
-ASCII_IMAGE=ascii-image-converter
 NVIM=nvim
 DIRENV=direnv
 
@@ -124,25 +123,6 @@ check_for_package_and_install() {
                 makepkg -si
                 cd "$ORIGINAL_DIR" || return 1
             fi
-        fi
-    fi
-}
-
-# Installation functions
-install_ascii_image() {
-    echo Installing $ASCII_IMAGE
-    #https://github.com/TheZoraiz/ascii-image-converter
-    if [[ $DRY_RUN != 0 ]]; then
-        if [[ $OS =~ "Arch" ]]; then
-            check_for_package_and_install $ASCII_IMAGE-git
-        elif [[ $OS =~ "Ubuntu" || $OS =~ "Debian" ]]; then
-            filepath='/etc/apt/sources.list.d/ascii-image-converter.list'
-            if [ ! -s $filepath ]; then
-                echo hello
-                echo 'deb [trusted=yes] https://apt.fury.io/ascii-image-converter/ /' | sudo tee $filepath
-                sudo apt update
-            fi
-            check_for_package_and_install $ASCII_IMAGE
         fi
     fi
 }

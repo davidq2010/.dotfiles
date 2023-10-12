@@ -146,12 +146,15 @@ if [[ ! -z "$WSLENV" ]]; then
   export DISPLAY=localhost:0.0
 fi
 
-figlet "Welcome $USER"
+if command -v figlet >/dev/null 2>&1; then
+  figlet "Welcome $USER"
+fi
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
+export PROMPT_DIRTRIM=2
 
 # Hook direnv if it exists
 if command -v direnv >/dev/null 2>&1; then
@@ -171,22 +174,6 @@ fi
 
 # ensure compatibility tmux <-> direnv
 if [ -n "$TMUX" ] && [ -n "$DIRENV_DIR" ]; then
-    unset "${!DIRENV_@}"  # unset env vars starting with DIRENV_
+  unset "${!DIRENV_@}"  # unset env vars starting with DIRENV_
+  eval "$(direnv hook bash)"
 fi
-eval "$(direnv hook bash)"
-
-# succinct PS1: https://stackoverflow.com/questions/3497885/code-challenge-bash-prompt-path-shortener
-_dir_chomp() {
-    local IFS=/ c=1 n d
-    local p=(${1/#$HOME/\~}) r=${p[*]}
-    local s=${#r}
-    while ((s>$2&&c<${#p[*]}-1))
-    do
-        d=${p[c]}
-        n=1;[[ $d = .* ]]&&n=2
-        ((s-=${#d}-n))
-        p[c++]=${d:0:n}
-    done
-    echo "${p[*]}"
-}
-PS1='\e[0;32m$(_dir_chomp "$PWD" 20)\e[m$ '
