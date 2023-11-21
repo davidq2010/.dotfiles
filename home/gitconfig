@@ -5,3 +5,5 @@
 	name = davidq2010
 [core]
 	editor=vim
+[pull]
+	rebase = false

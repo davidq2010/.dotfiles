@@ -10,7 +10,6 @@ return {
     dependencies = {
       "p00f/nvim-ts-rainbow", -- rainbow parentheses
       "windwp/nvim-ts-autotag", -- auto-pair tags
-      "JoosepAlviste/nvim-ts-context-commentstring",
     },
     config = function()
       require("nvim-treesitter.configs").setup({
@@ -28,7 +27,6 @@ return {
         -- plugins
         autotag = { enable = true },
         rainbow = { enable = true },
-        context_commentstring = { enable = true },
       })
     end,
   },
