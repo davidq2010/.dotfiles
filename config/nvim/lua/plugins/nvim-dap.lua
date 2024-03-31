@@ -51,6 +51,9 @@ return {
       config = dapui_config,
     },
     {
+      "nvim-neotest/nvim-nio",
+    },
+    {
       "theHamsta/nvim-dap-virtual-text",
       config = dap_virtual_text_config,
     },
