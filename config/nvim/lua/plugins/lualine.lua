@@ -6,7 +6,7 @@ return {
   config = function()
     require("lualine").setup({
       options = {
-        theme = "dracula-nvim",
+        theme = "tokyonight",
         component_separators = "|",
         section_separators = "",
       },

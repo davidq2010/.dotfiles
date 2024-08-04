@@ -6,13 +6,12 @@ return {
   {
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
-    event = { "BufReadPre", "BufNewFile" },
+    event = { "VeryLazy" },
     dependencies = {
       "p00f/nvim-ts-rainbow", -- rainbow parentheses
       "windwp/nvim-ts-autotag", -- auto-pair tags
     },
-    config = function()
-      require("nvim-treesitter.configs").setup({
+    opts = {
         ensure_installed = "all",
 
         highlight = {
@@ -21,13 +20,18 @@ return {
         },
         indent = {
           enable = true,
-          disable = { "python" },
+          -- disable = { },
         }, -- experimental (indentation based on treesitter for = operator)
 
         -- plugins
         autotag = { enable = true },
         rainbow = { enable = true },
-      })
+    },
+    config = function(_, opts)
+      -- Prefer git instead of curl in order to improve connectivity in some environments
+      require('nvim-treesitter.install').prefer_git = true
+      ---@diagnostic disable-next-line: missing-fields
+      require('nvim-treesitter.configs').setup(opts)
     end,
   },
 }

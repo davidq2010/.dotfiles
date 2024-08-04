@@ -1,0 +1,8 @@
+Settings > Appearance > Font Face = Hack Nerd Font Mono
+Default Profile > Copy/Paste should be Ctrl+Shft+C and Ctrl+Shft+V
+
+AnyConnect VPN workaround (to access network in WSL):
+- Script at C:\Tools\anyconnectworkaround.ps1
+- Script also at /bin/vpn-dns.sh
+
+Schedule Task via Powershell: https://devblogs.microsoft.com/scripting/use-powershell-to-create-scheduled-tasks/

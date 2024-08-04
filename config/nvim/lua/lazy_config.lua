@@ -28,7 +28,8 @@ require("lazy").setup(
   -- opts
   {
     install = {
-      colorscheme = { "dracula" },
+      missing = true,
+      colorscheme = { "tokyonight" },
     },
     checker = {
       enabled = true,

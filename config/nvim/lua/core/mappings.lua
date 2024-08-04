@@ -5,7 +5,7 @@ u.nmap("Y", "y$")
 u.imap("<C-U>", "<C-G>u<C-U>")
 u.imap("<C-W>", "<C-G>u<C-W>")
 -- https://stackoverflow.com/a/662914
-u.nmap("<CR>", "<Cmd>nohlsearch<CR><CR>")
+u.nmap("<Esc>", "<cmd>nohlsearch<CR>")
 
 -- move visual lines around as a chunk
 u.vmap("J", ":m '>+1<CR>gv=gv")

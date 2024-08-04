@@ -1,19 +1,3 @@
--- Highlights trailing whitespace and automatically removes it on write
--- https://vim.fandom.com/wiki/Highlight_unwanted_spaces
--- Create highlight group
-vim.cmd([[
-  highlight ExtraWhitespace ctermbg=cyan guibg=cyan
-  augroup highlight_extrawhitespace
-    autocmd!
-    " Prevent colorschemes loaded later from clearing custom highlight groups
-    autocmd ColorScheme * highlight ExtraWhitespace ctermbg=cyan guibg=cyan
-    autocmd BufWinEnter * match ExtraWhitespace /\s\+$/             "Matches in all buffers
-    autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/      "Don't match when typing at end of line
-    autocmd InsertLeave * match ExtraWhitespace /\s\+$/             "Match after leaving Insert Mode
-    autocmd BufWinLeave * call clearmatches()                       "Prevent memory leaks
-  augroup END
-]])
-
 vim.api.nvim_create_autocmd("VimResized", {
     pattern = "*",
     command = "wincmd =",
@@ -21,11 +5,12 @@ vim.api.nvim_create_autocmd("VimResized", {
 })
 
 vim.api.nvim_create_autocmd("TextYankPost", {
+    desc = 'Highlight when yanking (copying) text',
+    group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
     pattern = "*",
     callback = function()
         vim.highlight.on_yank({ higroup = "IncSearch", timeout = 500 })
     end,
-    desc = "Briefly highlight on yank",
 })
 
 -- Remember folds
@@ -76,12 +61,4 @@ vim.api.nvim_create_autocmd("BufWritePre", {
     pattern = "*",
     callback = "g:TrimEndLinesAndTrailingWhitespace",
     desc = "Remove blank lines at end of file and remember cursor position",
-})
-
--- Do not auto-wrap comments using textwidth
--- Do not automatically insert comment leader after hitting o or O in Normal mode
-vim.api.nvim_create_autocmd("FileType", {
-    pattern = "*",
-    command = "setlocal formatoptions-=o formatoptions-=c formatoptions+=t formatoptions+=j formatoptions+=r formatoptions+=q formatoptions+=l",
-    desc = "Set options for how Vim formats text"
 })
