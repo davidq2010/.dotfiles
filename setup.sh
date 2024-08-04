@@ -30,6 +30,9 @@ CPPCHECK=cppcheck
 PYLINT=pylint
 NVIM=nvim
 DIRENV=direnv
+FZF=fzf
+BAT=bat
+LAZYGIT=lazygit
 
 # Map binaries to their installation functions
 # https://stackoverflow.com/questions/5672289/bash-pass-a-function-as-parameter
@@ -51,6 +54,9 @@ declare -A INSTALL_FNS=(
     [ASCII_IMAGE]="install_ascii_image"
     [NVIM]="install_nvim"
     [DIRENV]="install_direnv"
+    [FZF]="install_fzf"
+    [BAT]="install_bat"
+    [LAZYGIT]="install_lazygit"
 )
 
 # Determine system package installer based on OS
@@ -304,6 +310,27 @@ install_nvim () {
     fi
 }
 
+install_bat () {
+    echo Installing $BAT...
+    if [[ $DRY_RUN != 0 ]]; then
+        check_for_package_and_install $BAT
+    fi
+}
+
+install_fzf () {
+    echo Installing $FZF...
+    if [[ $DRY_RUN != 0 ]]; then
+        check_for_package_and_install $FZF
+    fi
+}
+
+install_lazygit () {
+    echo Installing $LAZYGIT...
+    if [[ $DRY_RUN != 0 ]]; then
+        check_for_package_and_install $LAZYGIT
+    fi
+}
+
 # Determine order of installation based on dependency graph (DFS)
 install_python
 install_pip
@@ -318,3 +345,6 @@ for binary in $INSTALL_ORDER; do
 done
 
 install_direnv
+install_fzf
+install_bat
+install_lazygit

@@ -26,3 +26,5 @@ cdl() {
     cd "$directory" && ls $args
   fi
 }
+
+alias fzfi='nvim $(fzf -m --preview="bat --color=always {}")'
