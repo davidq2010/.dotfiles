@@ -23,25 +23,24 @@ return {
         -- Mappings
         -- See `:help vim.lsp.*` for documentation on any of the below functions
         -- https://github.com/neovim/nvim-lspconfig#suggested-configuration
-        u.buf_map("n", "<space>K", vim.lsp.buf.hover, { desc = "Hover" }, bufnr)
-        u.buf_map("n", "<space>k", vim.lsp.buf.signature_help, { desc = "Signature Help" }, bufnr)
-        u.buf_map("n", "<space>gD", vim.lsp.buf.declaration, { desc = "Declaration" }, bufnr)
-        u.buf_map("n", "<space>gd", vim.lsp.buf.definition, { desc = "Definition" }, bufnr)
-        u.buf_map("n", "<space>gT", vim.lsp.buf.type_definition, { desc = "Type Definition" }, bufnr)
-        u.buf_map("n", "<space>gr", vim.lsp.buf.references, { desc = "References" }, bufnr)
-        u.buf_map("n", "<space>gi", vim.lsp.buf.implementation, { desc = "Implementation" }, bufnr)
-        u.buf_map("n", "<space>wa", vim.lsp.buf.add_workspace_folder, { desc = "Add Workspace Folder" }, bufnr)
-        u.buf_map("n", "<space>wr", vim.lsp.buf.remove_workspace_folder, { desc = "Remove Workspace Folder" }, bufnr)
+        u.buf_map("n", "<space>K", vim.lsp.buf.hover, { desc = "Hover" })
+        u.buf_map("n", "<space>k", vim.lsp.buf.signature_help, { desc = "Signature Help" })
+        u.buf_map("n", "<space>gD", vim.lsp.buf.declaration, { desc = "Declaration" })
+        u.buf_map("n", "<space>gd", vim.lsp.buf.definition, { desc = "Definition" })
+        u.buf_map("n", "<space>gT", vim.lsp.buf.type_definition, { desc = "Type Definition" })
+        u.buf_map("n", "<space>gr", vim.lsp.buf.references, { desc = "References" })
+        u.buf_map("n", "<space>gi", vim.lsp.buf.implementation, { desc = "Implementation" })
+        u.buf_map("n", "<space>wa", vim.lsp.buf.add_workspace_folder, { desc = "Add Workspace Folder" })
+        u.buf_map("n", "<space>wr", vim.lsp.buf.remove_workspace_folder, { desc = "Remove Workspace Folder" })
         u.buf_map("n", "<space>wl", function()
           print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-        end, { desc = "List dir" }, bufnr)
-        u.buf_map("n", "<space>rn", vim.lsp.buf.rename, { desc = "Rename" }, bufnr)
-        u.buf_map("n", "<space>ca", vim.lsp.buf.code_action, { desc = "Code Action" }, bufnr)
+        end, { desc = "List dir" })
+        u.buf_map("n", "<space>rn", vim.lsp.buf.rename, { desc = "Rename" })
+        u.buf_map("n", "<space>ca", vim.lsp.buf.code_action, { desc = "Code Action" })
         u.buf_map("n", "<space>f", function()
           vim.lsp.buf.format({ async = true })
-        end, { desc = "Format" }, bufnr)
+        end, { desc = "Format" })
 
-        require("illuminate").on_attach(client)
         -- The following two autocommands are used to highlight references of the
         -- word under your cursor when your cursor rests there for a little while.
         --    See `:help CursorHold` for information about when this is executed
@@ -136,14 +135,6 @@ return {
           },
         },
       },
-      ruff_lsp = {
-        on_attach = function(client)
-          if client.name == "ruff_lsp" then
-            -- Disable hover in favor of Pyright
-            client.server_capabilities.hoverProvider = false
-          end
-        end,
-      },
     }
 
     --local mason_status_ok, mason_lspconfig = pcall(require, "mason_lspconfig")
@@ -156,7 +147,6 @@ return {
       "stylua",
       "isort",
       "black",
-      "tsserver",
     })
 
     require("mason").setup()
